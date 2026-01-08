@@ -9,6 +9,7 @@
     ./modules/vietnamese.nix
     ./modules/dev.nix
   ];
+  nixpkgs.config.allowUnfree = true;
 
   networking.hostName = "nixos";
 
