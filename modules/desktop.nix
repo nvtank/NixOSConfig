@@ -3,8 +3,8 @@
 {
   # GNOME (nếu bạn đang dùng GNOME thì giữ)
   services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+  # services.displayManager.gdm.enable = true;
+  #services.desktopManager.gnome.enable = true;
 
   # Âm thanh (PipeWire)
   services.pipewire = {
