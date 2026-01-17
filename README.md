@@ -6,14 +6,6 @@ This repository contains my **NixOS system configuration using Flakes**, organiz
 
 ---
 
-## Goals
-
-- Reproducible NixOS setup with **flakes**
-- Modular structure (`modules/*.nix`)
-- Smooth desktop + terminal experience (KDE/Plasma + Kitty + Zsh)
-- Easy rebuild, rollback, and cleanup (generations / boot entries)
-
----
 
 ## Repository Layout
 
