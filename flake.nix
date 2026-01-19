@@ -8,19 +8,12 @@
   outputs = { self, nixpkgs, ... }:
   let
     system = "x86_64-linux";
-  in
-  {
+  in {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       inherit system;
       modules = [
-	 ./hardware-configuration.nix
-         ./configuration.nix
-	 ./modules/terminal.nix
-	 ./modules/ui.nix
-         ./modules/desktop.nix
-         ./modules/shell.nix
+        ./configuration.nix
       ];
     };
   };
 }
-

@@ -2,15 +2,14 @@
 
 {
   environment.systemPackages = with pkgs; [
-    kitty
-    kitty-themes
-    starship
     fzf
     zoxide
     eza
     bat
     fd
     ripgrep
+    starship
+    fzf zoxide eza bat fd ripgrep fastfetch
     fastfetch
   ];
 
@@ -22,16 +21,18 @@
 
     interactiveShellInit = ''
       # Starship prompt
-      eval "$(${pkgs.starship}/bin/starship init zsh)"
+      if command -v starship >/dev/null 2>&1; then
+        eval "$(starship init zsh)"
+      fi
 
-      # fzf keybindings (Ctrl+R)
+      # fzf keybindings & completion
       source ${pkgs.fzf}/share/fzf/key-bindings.zsh
       source ${pkgs.fzf}/share/fzf/completion.zsh
 
-      # zoxide 
+      # zoxide
       eval "$(${pkgs.zoxide}/bin/zoxide init zsh)"
 
-      # eza aliases
+      # aliases
       alias ls="eza --icons"
       alias ll="eza -lah --icons"
       alias cat="bat"
@@ -39,14 +40,4 @@
   };
 
   programs.command-not-found.enable = true;
-
-  # Kitty config hệ thống (áp dụng cho mọi user)
-  environment.etc."xdg/kitty/kitty.conf".text = ''
-    font_family JetBrainsMono Nerd Font
-    font_size 12.0
-    background_opacity 0.92
-    confirm_os_window_close 0
-    enable_audio_bell no
-    cursor_shape beam
-  '';
 }

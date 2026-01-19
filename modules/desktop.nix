@@ -6,16 +6,8 @@
 
   # GNOME + GDM
   services.displayManager.gdm.enable = true;
-
   services.desktopManager.gnome.enable = true;
   
- # environment.systemPackages = with pkgs; [
-    #gnome-session 
-    #gnome-shell
-    #gnome-control-center
-   # nautilus  
-  #];
-
   # GNOME 
   programs.dconf.enable = true;
 
@@ -26,7 +18,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
   };
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
 
   # Bluetooth
   hardware.bluetooth.enable = true;
@@ -37,8 +29,4 @@
  
   # Firewall
   networking.firewall.enable = true;
-
-  # Timezone + locale base
-  time.timeZone = "Asia/Ho_Chi_Minh";
-  i18n.defaultLocale = "en_US.UTF-8";
 }
