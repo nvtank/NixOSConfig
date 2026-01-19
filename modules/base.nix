@@ -1,13 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   networking.networkmanager.enable = true;
 
   time.timeZone = "Asia/Ho_Chi_Minh";
 
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  # ÉP danh sách locale để tránh module khác “đẻ” vi_VN vào và làm glibc-locales fail
   i18n.supportedLocales = lib.mkForce [
     "en_US.UTF-8/UTF-8"
   ];
@@ -18,14 +17,6 @@
   };
 
   services.blueman.enable = true;
-
-  i18n.inputMethod = {
-    type = "fcitx5";
-    fcitx5.addons = with pkgs; [
-      qt6Packages.fcitx5-unikey
-      fcitx5-gtk
-    ];
-  };
 
   environment.systemPackages = with pkgs; [
     bluez

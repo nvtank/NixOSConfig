@@ -1,28 +1,17 @@
 { config, pkgs, ... }:
 
 {
-  # Cài fzf ở mức system
   environment.systemPackages = with pkgs; [
-    fzf
+    kitty
+    kitty-themes
   ];
 
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-
-    # Bật fzf Ctrl+R + completion cho zsh
-    interactiveShellInit = ''
-      # fzf keybindings & completion
-      source ${pkgs.fzf}/share/fzf/key-bindings.zsh
-      source ${pkgs.fzf}/share/fzf/completion.zsh
-    '';
-  };
-
-  # đặt zsh làm shell mặc định cho user
-  users.users.nvtank.shell = pkgs.zsh;
-
-  programs.command-not-found.enable = true;
+  environment.etc."xdg/kitty/kitty.conf".text = ''
+    font_family JetBrainsMono Nerd Font
+    font_size 12.0
+    background_opacity 0.92
+    confirm_os_window_close 0
+    enable_audio_bell no
+    cursor_shape beam
+  '';
 }

@@ -14,7 +14,7 @@
     unzip
     
      # Web
-    nodejs_22
+    nodejs_20
     pnpm
 
     # Python
@@ -23,7 +23,7 @@
     python3Packages.virtualenv
 
     # Java
-    jdk21
+    jdk17
     maven
     gradle
 
