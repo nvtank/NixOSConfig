@@ -14,7 +14,7 @@
     htop
     btop
     tree
-
+    
     # Dev
     nodejs_20
     python3
