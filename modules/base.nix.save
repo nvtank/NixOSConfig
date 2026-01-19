@@ -26,7 +26,19 @@
       fcitx5-gtk
     ];
   };
+  
+  systemd.user.services.fcitx5 = {
+  enable = true;
+  description = "Fcitx5 Input Method";
+  wantedBy = [ "graphical-session.target" ];
+  serviceConfig = {
+    ExecStart = "${pkgs.fcitx5}/bin/fcitx5 -d";
+    Restart = "on-failure";
+    RestartSec = 2;
+    };
+  };
 
+ 
   environment.systemPackages = with pkgs; [
     bluez
     kdePackages.bluedevil

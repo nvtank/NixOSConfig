@@ -17,6 +17,7 @@
          ./configuration.nix
 	 ./modules/terminal.nix
 	 ./modules/ui.nix
+         ./modules/desktop.nix
          ./modules/shell.nix
       ];
     };

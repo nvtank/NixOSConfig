@@ -3,6 +3,7 @@
 {
   environment.systemPackages = with pkgs; [
     vscode
+    libreoffice-fresh
     git
     vim
     neovim

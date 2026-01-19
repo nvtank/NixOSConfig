@@ -1,10 +1,23 @@
 { config, pkgs, ... }:
 
 {
-  # GNOME (nếu bạn đang dùng GNOME thì giữ)
+  # server
   services.xserver.enable = true;
-  # services.displayManager.gdm.enable = true;
-  #services.desktopManager.gnome.enable = true;
+
+  # GNOME + GDM
+  services.displayManager.gdm.enable = true;
+
+  services.desktopManager.gnome.enable = true;
+  
+ # environment.systemPackages = with pkgs; [
+    #gnome-session 
+    #gnome-shell
+    #gnome-control-center
+   # nautilus  
+  #];
+
+  # GNOME 
+  programs.dconf.enable = true;
 
   # Âm thanh (PipeWire)
   services.pipewire = {
@@ -15,17 +28,17 @@
   };
   hardware.pulseaudio.enable = false;
 
-  # Bluetooth (nếu cần)
+  # Bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  # Flatpak (nếu bạn hay cài app kiểu Discord/Spotify)
+  # Flatpak
   services.flatpak.enable = true;
-
+ 
   # Firewall
   networking.firewall.enable = true;
 
-  # Timezone + locale base (tùy bạn)
+  # Timezone + locale base
   time.timeZone = "Asia/Ho_Chi_Minh";
   i18n.defaultLocale = "en_US.UTF-8";
 }
