@@ -1,8 +1,11 @@
 { pkgs, ... }:
 
 {
+  nixpkgs.config.allowUnfree = true;
+
   environment.systemPackages = with pkgs; [
     vscode
+    antigravity
     libreoffice-fresh
     git
     vim
@@ -40,9 +43,6 @@
     
     zip
     fastfetch
-      (pkgs.writeShellScriptBin "antigravity" ''
-      exec /home/nvtank/year3/gooogle/Antigravity/antigravity "$@"
-    '')
   ];
 
   environment.etc."xdg/applications/antigravity.desktop".text = ''

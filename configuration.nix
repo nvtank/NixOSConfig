@@ -27,8 +27,11 @@
   environment.systemPackages = with pkgs; [
     zotero
     firefox
+    antigravity
+    unityhub
     vim
     wget
+    gemini-cli
     curl
   ];
 
