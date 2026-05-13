@@ -1,11 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 {
-  nixpkgs.config.allowUnfree = true;
-
   environment.systemPackages = with pkgs; [
     vscode
-    antigravity
     libreoffice-fresh
     git
     vim
@@ -16,7 +13,7 @@
     tree
     unzip
     
-     # Web
+    # Web
     nodejs_20
     pnpm
 
@@ -43,14 +40,8 @@
     
     zip
     fastfetch
-  ];
 
-  environment.etc."xdg/applications/antigravity.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Antigravity
-    Exec=antigravity
-    Terminal=false
-    Categories=Utility;
-  '';  
+    appimage-run
+    inputs.antigravity.packages.${pkgs.system}.default
+  ];
 }

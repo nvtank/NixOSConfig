@@ -35,7 +35,16 @@
       # aliases
       alias ls="eza --icons"
       alias ll="eza -lah --icons"
+      alias s='shutdown now'
+      alias c='clear'
       alias cat="bat"
+      alias re='reboot'
+      alias ga='git add .'
+      alias gcl='git clone'
+      alias gpl ='git pull origin main'
+      alias gc ='git checkout -b'
+      alias gm ='git commit -m'
+      alias gp ='git push origin'
     '';
   };
 
