@@ -69,7 +69,6 @@
     zotero
     firefox
     unityhub
-    vim
     spotify
     wget
     gemini-cli
@@ -79,8 +78,6 @@
     gnome-tweaks
     curl
     sassc
-    kiro
-    mongodb-tools
     stdenv.cc.cc.lib
     zlib
     openssl
@@ -88,12 +85,11 @@
     gcc
     postgresql
     flutter
-    rustdesk
-    figma-linux
     pkg-config
     supabase-cli
-    krita
     mongosh
+    awscli2
+    ssm-session-manager-plugin
     google-chrome
   ];
 
