@@ -14,6 +14,5 @@
   users.users.nvtank.extraGroups = lib.mkAfter [ "docker" "adbusers" ];
 
   environment.systemPackages = with pkgs; [
-    android-studio
   ];
 }
