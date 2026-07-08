@@ -12,6 +12,7 @@
     htop
     tree
     unzip
+    edit
     
     # Web
     nodejs_20
