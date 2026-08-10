@@ -15,7 +15,10 @@
       inherit system;
       specialArgs = {
         inherit inputs;
-        unstablePkgs = import nixpkgs-unstable { inherit system; };
+        unstablePkgs = import nixpkgs-unstable {
+           inherit system;
+           config.allowUnfree = true;
+        };
       };
       modules = [
         ./configuration.nix

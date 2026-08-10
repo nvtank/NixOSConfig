@@ -1,8 +1,7 @@
-{ pkgs, inputs, ... }:
-
-{
+{ pkgs, unstablePkgs, inputs, ... }: {
   environment.systemPackages = with pkgs; [
-    vscode
+    unstablePkgs.vscode
+
     libreoffice-fresh
     git
     vim
@@ -12,8 +11,7 @@
     htop
     tree
     unzip
-    edit
-    
+
     # Web
     nodejs_20
     pnpm
@@ -38,10 +36,9 @@
     # Go
     go
     gopls
-    
+
     zip
     fastfetch
-
     appimage-run
     inputs.antigravity.packages.${pkgs.system}.default
   ];

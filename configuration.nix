@@ -54,43 +54,13 @@
   services.gnome.gnome-keyring.enable = true;
 
   # Docker
-  virtualisation.docker.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    package = pkgs.docker_29;
+  };
 
   users.users.nvtank.extraGroups = [ "docker" ];
-  # ZSH + gợi ý lệnh + highlight command
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-    interactiveShellInit = ''
-      # Starship prompt
-      if command -v starship >/dev/null 2>&1; then
-        eval "$(starship init zsh)"
-      fi
-
-      # fzf keybindings & completion
-      source ${pkgs.fzf}/share/fzf/key-bindings.zsh
-      source ${pkgs.fzf}/share/fzf/completion.zsh
-
-      # zoxide
-      eval "$(${pkgs.zoxide}/bin/zoxide init zsh)"
-
-      # aliases
-      alias ls="eza --icons"
-      alias ll="eza -lah --icons"
-      alias s='shutdown now'
-      alias c='clear'
-      alias cat="bat"
-      alias re='reboot'
-      alias ga='git add .'
-      alias gcl='git clone'
-      alias gpl ='git pull origin main'
-      alias gc ='git checkout -b'
-      alias gm ='git commit -m'
-      alias gp ='git push origin'
-    '';
-  };
+  # ZSH được cấu hình đầy đủ trong modules/shell.nix
 
   # Hỗ trợ chạy một số binary Linux ngoài NixOS
   programs.nix-ld.enable = true;
@@ -113,6 +83,8 @@
     # Basic tools
     wget
     curl
+    git
+    jq
     appimage-run
     unzip
     gnumake
@@ -124,12 +96,16 @@
     awscli2
     ssm-session-manager-plugin
     terraform
+    kubectl
+    kubernetes-helm
+    eksctl
+    k9s
 
     # GNOME customization
     gnomeExtensions.user-themes
     gnome-tweaks
     sassc
-
+    google-chrome
     # Docker
     docker-compose
 
@@ -141,10 +117,7 @@
     # Database / backend tools
     postgresql
     mongosh
-    supabase-cli
 
-    # Mobile dev
-    flutter
   ];
 
   system.stateVersion = "25.11";
