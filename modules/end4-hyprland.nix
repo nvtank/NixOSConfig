@@ -101,6 +101,11 @@ let
       chmod -R u+w "$config_root/hypr.end4-new" "$config_root/quickshell.end4-new"
       rsync -a --no-owner --no-group --exclude='.git' ${inputs.end4-pc}/ "$config_root/quickshell.end4-new/end4-pC/"
 
+      # This laptop's touchpad feels reversed with the end4 shell override.
+      # Apply the user's preferred physical scroll direction after staging.
+      sed -i 's/natural_scroll = false/natural_scroll = true/' \
+        "$config_root/hypr.end4-new/hyprland/shellOverrides/main.lua"
+
       cp ${end4Variables} "$config_root/hypr.end4-new/custom/variables.lua"
       cp ${end4Execs} "$config_root/hypr.end4-new/custom/execs.lua"
       cp ${end4Keybinds} "$config_root/hypr.end4-new/custom/keybinds.lua"
