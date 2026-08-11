@@ -101,6 +101,16 @@ let
       chmod -R u+w "$config_root/hypr.end4-new" "$config_root/quickshell.end4-new"
       rsync -a --no-owner --no-group --exclude='.git' ${inputs.end4-pc}/ "$config_root/quickshell.end4-new/end4-pC/"
 
+      # A crash/restart must not leave more than one shell instance creating
+      # layer surfaces. Keep this patch next to the upstream config import so
+      # future end4-setup runs retain the duplicate-instance guard.
+      # shellcheck disable=SC2016 # $qsConfig belongs to the generated Lua.
+      sed -i 's|hl.exec_cmd("qs -c $qsConfig")|hl.exec_cmd("qs --no-duplicate -c $qsConfig")|' \
+        "$config_root/hypr.end4-new/hyprland/execs.lua"
+      # shellcheck disable=SC2016 # $qsConfig belongs to the generated Lua.
+      sed -i 's|killall ydotool qs quickshell; qs -c $qsConfig &|killall ydotool qs quickshell; qs --no-duplicate -c $qsConfig \&|' \
+        "$config_root/hypr.end4-new/hyprland/keybinds.lua"
+
       # This laptop's touchpad feels reversed with the end4 shell override.
       # Apply the user's preferred physical scroll direction after staging.
       sed -i 's/natural_scroll = false/natural_scroll = true/' \
