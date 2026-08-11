@@ -2,4 +2,7 @@
 -- Start the existing NixOS fcitx5-with-addons service only in this session.
 hl.on("hyprland.start", function ()
     hl.exec_cmd("systemctl --user start fcitx5-daemon.service")
+    -- Hyprland does not process Blueman's XDG autostart entry. Without its
+    -- agent BlueZ cannot display/confirm pairing requests.
+    hl.exec_cmd("blueman-applet")
 end)

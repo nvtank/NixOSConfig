@@ -45,6 +45,86 @@ let
   end4Variables = ./end4-variables.lua;
   end4Execs = ./end4-execs.lua;
   end4Keybinds = ./end4-keybinds.lua;
+  end4Rules = ./end4-rules.lua;
+
+  end4Screenshot = pkgs.writeShellApplication {
+    name = "end4-screenshot";
+    runtimeInputs = with pkgs; [ coreutils hyprshot libnotify xdg-user-dirs ];
+    text = ''
+      mode="''${1:-region}"
+      output_dir="$(xdg-user-dir PICTURES)/Screenshots"
+      mkdir -p "$output_dir"
+
+      case "$mode" in
+        region) hyprshot --freeze --mode region --output-folder "$output_dir" ;;
+        output) hyprshot --mode output --mode active --output-folder "$output_dir" ;;
+        *) echo "Usage: end4-screenshot [region|output]" >&2; exit 2 ;;
+      esac
+    '';
+  };
+
+  end4ScreenRecord = pkgs.writeShellApplication {
+    name = "end4-screen-record";
+    runtimeInputs = [ hyprlandPackage ] ++ (with pkgs; [ coreutils jq libnotify procps slurp util-linux wf-recorder xdg-user-dirs xdg-utils ]);
+    text = ''
+      state_dir="''${XDG_RUNTIME_DIR:-/tmp}/end4-screen-record"
+      pid_file="$state_dir/pid"
+      output_file="$state_dir/output"
+      mkdir -p "$state_dir"
+      exec 9>"$state_dir/lock"
+      flock --nonblock 9 || exit 0
+
+      if [[ -s "$pid_file" ]]; then
+        recorder_pid="$(<"$pid_file")"
+        if kill -0 "$recorder_pid" 2>/dev/null; then
+          kill -INT "$recorder_pid"
+          saved_file="$(<"$output_file")"
+          for _ in $(seq 1 50); do
+            kill -0 "$recorder_pid" 2>/dev/null || break
+            sleep 0.1
+          done
+          rm -f "$pid_file" "$output_file"
+          notify-send "Screen recording saved" "$saved_file"
+          xdg-open "$(dirname "$saved_file")" >/dev/null 2>&1 &
+          exit 0
+        fi
+        rm -f "$pid_file" "$output_file"
+      fi
+
+      videos_dir="$(xdg-user-dir VIDEOS)/Recordings"
+      mkdir -p "$videos_dir"
+      saved_file="$videos_dir/Recording_$(date '+%Y-%m-%d_%H.%M.%S').mp4"
+
+      countdown() {
+        for seconds in 3 2 1; do
+          notify-send --replace-id=7391 --expire-time=900 \
+            "Screen recording" "Starting in $seconds…"
+          sleep 1
+        done
+        notify-send --replace-id=7391 --expire-time=1200 \
+          "● Recording" "Press the same shortcut again to stop"
+      }
+
+      case "''${1:-region}" in
+        region)
+          geometry="$(slurp)" || exit 0
+          countdown
+          wf-recorder --geometry "$geometry" --file "$saved_file" >/tmp/end4-wf-recorder.log 2>&1 &
+          ;;
+        output)
+          monitor="$(hyprctl activeworkspace -j | jq -r '.monitor')"
+          countdown
+          wf-recorder --output "$monitor" --file "$saved_file" >/tmp/end4-wf-recorder.log 2>&1 &
+          ;;
+        *) echo "Usage: end4-screen-record [region|output]" >&2; exit 2 ;;
+      esac
+
+      recorder_pid=$!
+      printf '%s\n' "$recorder_pid" > "$pid_file"
+      printf '%s\n' "$saved_file" > "$output_file"
+      notify-send "Screen recording started" "Press the same shortcut again to stop"
+    '';
+  };
 
   end4Setup = pkgs.writeShellApplication {
     name = "end4-setup";
@@ -101,6 +181,16 @@ let
       chmod -R u+w "$config_root/hypr.end4-new" "$config_root/quickshell.end4-new"
       rsync -a --no-owner --no-group --exclude='.git' ${inputs.end4-pc}/ "$config_root/quickshell.end4-new/end4-pC/"
 
+      # A crash/restart must not leave more than one shell instance creating
+      # layer surfaces. Keep this patch next to the upstream config import so
+      # future end4-setup runs retain the duplicate-instance guard.
+      # shellcheck disable=SC2016 # $qsConfig belongs to the generated Lua.
+      sed -i 's|hl.exec_cmd("qs -c $qsConfig")|hl.exec_cmd("qs --no-duplicate -c $qsConfig")|' \
+        "$config_root/hypr.end4-new/hyprland/execs.lua"
+      # shellcheck disable=SC2016 # $qsConfig belongs to the generated Lua.
+      sed -i 's|killall ydotool qs quickshell; qs -c $qsConfig &|killall ydotool qs quickshell; qs --no-duplicate -c $qsConfig \&|' \
+        "$config_root/hypr.end4-new/hyprland/keybinds.lua"
+
       # This laptop's touchpad feels reversed with the end4 shell override.
       # Apply the user's preferred physical scroll direction after staging.
       sed -i 's/natural_scroll = false/natural_scroll = true/' \
@@ -109,6 +199,7 @@ let
       cp ${end4Variables} "$config_root/hypr.end4-new/custom/variables.lua"
       cp ${end4Execs} "$config_root/hypr.end4-new/custom/execs.lua"
       cp ${end4Keybinds} "$config_root/hypr.end4-new/custom/keybinds.lua"
+      cp ${end4Rules} "$config_root/hypr.end4-new/custom/rules.lua"
 
       if [[ -e "$config_root/hypr" ]]; then
         mv "$config_root/hypr" "$backup_dir/hypr.pre-switch"
@@ -221,6 +312,8 @@ in
     end4Quickshell
     end4Setup
     end4Rollback
+    end4Screenshot
+    end4ScreenRecord
 
     bc
     brightnessctl

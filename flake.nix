@@ -10,7 +10,8 @@
     # these separate from nixpkgs lets GNOME remain on the stable system set.
     hyprland.url = "github:hyprwm/Hyprland/v0.55.0";
     quickshell = {
-      url = "github:quickshell-mirror/quickshell/7511545ee20664e3b8b8d3322c0ffe7567c56f7a";
+      # Includes the PipeWire default-sink lifetime fix from quickshell#568.
+      url = "github:quickshell-mirror/quickshell/13fe9b0d98028361344b7422b1ebe238d1d29d02";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     illogical-impulse = {

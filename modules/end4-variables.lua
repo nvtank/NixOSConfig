@@ -2,6 +2,11 @@
 -- Keep the base illogical-impulse config available while selecting end4-pC.
 hl.env("qsConfig", "end4-pC")
 
--- end4-pC embeds Settings in the running shell; its old standalone
--- settings.qml path no longer exists.
-settingsApp = "qs -c $qsConfig ipc call settings open"
+-- Prefer the system-themed Kitty terminal. Foot remains installed as a safe
+-- fallback and can still be launched explicitly.
+terminal = "kitty --single-instance"
+
+-- Use the complete GNOME control center for network/Bluetooth management.
+-- GNOME normally refuses to start outside its own desktop unless this value
+-- is supplied explicitly.
+settingsApp = "env XDG_CURRENT_DESKTOP=GNOME gnome-control-center"
