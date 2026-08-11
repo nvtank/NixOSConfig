@@ -43,6 +43,8 @@ let
     '';
   };
   end4Variables = ./end4-variables.lua;
+  end4Execs = ./end4-execs.lua;
+  end4Keybinds = ./end4-keybinds.lua;
 
   end4Setup = pkgs.writeShellApplication {
     name = "end4-setup";
@@ -100,6 +102,8 @@ let
       rsync -a --no-owner --no-group --exclude='.git' ${inputs.end4-pc}/ "$config_root/quickshell.end4-new/end4-pC/"
 
       cp ${end4Variables} "$config_root/hypr.end4-new/custom/variables.lua"
+      cp ${end4Execs} "$config_root/hypr.end4-new/custom/execs.lua"
+      cp ${end4Keybinds} "$config_root/hypr.end4-new/custom/keybinds.lua"
 
       if [[ -e "$config_root/hypr" ]]; then
         mv "$config_root/hypr" "$backup_dir/hypr.pre-switch"
@@ -187,6 +191,17 @@ in
   services.upower.enable = true;
   services.geoclue2.enable = true;
   services.udev.packages = [ pkgs.ddcutil ];
+
+  # Hyprland does not process XDG autostart entries like GNOME does. Keep the
+  # configured Bamboo/Unikey input method alive for every graphical session.
+  systemd.user.services.fcitx5-daemon = {
+    description = "Fcitx5 input method daemon";
+    serviceConfig = {
+      ExecStart = "${config.i18n.inputMethod.package}/bin/fcitx5 -D -r";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+  };
 
   boot.kernelModules = [ "i2c-dev" ];
   users.users.nvtank.extraGroups = [ "video" "input" "i2c" ];
