@@ -14,6 +14,10 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
+    settings.General = {
+      AlwaysPairable = true;
+      PairableTimeout = 0;
+    };
   };
 
   services.blueman.enable = true;

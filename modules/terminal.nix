@@ -6,7 +6,7 @@
     kitty-themes
   ];
 
-  # Kitty terminal config - Catppuccin Mocha theme with enhanced visuals
+  # Kitty terminal config - translucent Catppuccin glass for Hyprland.
   environment.etc."xdg/kitty/kitty.conf".text = ''
     # ======================
     # Font
@@ -15,7 +15,7 @@
     bold_font        JetBrainsMono Nerd Font Bold
     italic_font      JetBrainsMono Nerd Font Italic
     bold_italic_font JetBrainsMono Nerd Font Bold Italic
-    font_size        13.0
+    font_size        13.5
     font_features    JetBrainsMonoNF-Regular +liga +calt
 
     # ======================
@@ -43,17 +43,17 @@
     # ======================
     # Window
     # ======================
-    window_padding_width        12
+    window_padding_width        14
     window_margin_width         0
     single_window_margin_width  0
     placement_strategy          center
     confirm_os_window_close     0
-    hide_window_decorations     no
+    hide_window_decorations     yes
     resize_debounce_time        0.1
 
     # Background blur & transparency
-    background_opacity          0.88
-    background_blur             48
+    background_opacity          0.78
+    background_blur             32
     dynamic_background_opacity  yes
 
     # ======================
@@ -62,10 +62,10 @@
     tab_bar_style               powerline
     tab_powerline_style         slanted
     tab_bar_min_tabs            1
-    tab_bar_edge                bottom
-    tab_bar_margin_width        0.0
-    tab_bar_margin_height       0.0 0.0
-    tab_title_template          "{fmt.fg.red}{bell_symbol}{activity_symbol}{fmt.fg.tab}{title}"
+    tab_bar_edge                top
+    tab_bar_margin_width        8.0
+    tab_bar_margin_height       8.0 0.0
+    tab_title_template          "  {fmt.fg.red}{bell_symbol}{activity_symbol}{fmt.fg.tab}{index}: {title}  "
     active_tab_font_style       bold
     inactive_tab_font_style     normal
 
@@ -73,7 +73,7 @@
     # Colors - Catppuccin Mocha
     # ======================
     foreground              #CDD6F4
-    background              #1E1E2E
+    background              #11111B
     selection_foreground    #1E1E2E
     selection_background    #F5E0DC
 
@@ -93,8 +93,8 @@
     active_tab_foreground   #11111B
     active_tab_background   #CBA6F7
     inactive_tab_foreground #CDD6F4
-    inactive_tab_background #181825
-    tab_bar_background      #11111B
+    inactive_tab_background #313244
+    tab_bar_background      #181825
 
     # Normal colors
     color0  #45475A
