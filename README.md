@@ -26,7 +26,7 @@ The desktop stack includes:
 
 ## Architecture and rollback paths
 
-![Hyprland stack and rollback flow](docs/images/hyprland-stack.svg)
+![Hyprland stack and rollback flow](docs/images/hyprland-stack-en.svg)
 
 The desktop sources are pinned in `flake.lock`, so rebuilds do not silently
 pull newer Hyprland or end4 revisions. `end4-setup` only replaces these two
@@ -64,7 +64,7 @@ authentication remains enabled.
 
 ## Essential shortcuts
 
-![Hyprland keyboard shortcuts](docs/images/hyprland-shortcuts.svg)
+![Hyprland keyboard shortcuts](docs/images/hyprland-shortcuts-en.svg)
 
 | Shortcut | Action |
 |---|---|
@@ -92,8 +92,8 @@ default input method and starts specifically with the Hyprland session.
 ├── hardware-configuration.nix
 ├── docs/images/
 │   ├── hyprland-desktop.png
-│   ├── hyprland-stack.svg
-│   └── hyprland-shortcuts.svg
+│   ├── hyprland-stack-en.svg
+│   └── hyprland-shortcuts-en.svg
 └── modules/
     ├── base.nix
     ├── desktop.nix             # GNOME/GDM fallback
