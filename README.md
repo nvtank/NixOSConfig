@@ -1,85 +1,159 @@
-# NixOS Configuration
+# NixOS + Hyprland end4
 
-A modular and comprehensive NixOS configuration managed with **Flakes**. This setup is designed for a modern development environment with a focus on web, mobile, and system programming, running on a GNOME desktop.
+![NixOS](https://img.shields.io/badge/NixOS-25.11-5277C3?logo=nixos&logoColor=white)
+![Hyprland](https://img.shields.io/badge/Hyprland-0.55.0-58E1FF?logo=wayland&logoColor=11111B)
+![Quickshell](https://img.shields.io/badge/Quickshell-0.2.1-CBA6F7)
 
-## 🚀 Overview
+Cấu hình NixOS cá nhân theo hướng **Hyprland + end4-pC**, có bộ gõ tiếng Việt,
+workflow dành cho lập trình và đường lui an toàn về GNOME.
 
-- **OS:** NixOS 25.11
-- **Hostname:** `nixos`
-- **Architecture:** `x86_64-linux`
-- **Window Manager:** GNOME (Wayland/X11)
-- **Shell:** Zsh + Starship
-- **Timezone:** Asia/Ho_Chi_Minh
+> Hyprland là desktop mặc định. GNOME/GDM vẫn được giữ lại để đăng nhập dự
+> phòng khi theme, GPU hoặc cấu hình Wayland gặp lỗi.
 
-## 📂 Project Structure
+## Giao diện
 
-The configuration is split into modular files for better maintainability:
+![Hyprland end4 desktop](docs/images/hyprland-desktop.png)
 
+Giao diện sử dụng:
+
+- **Hyprland 0.55** làm Wayland compositor.
+- **end4-pC** chạy trên **Quickshell 0.2.1** cho bar, launcher, overview,
+  notification, wallpaper và Settings.
+- `foot` làm terminal mặc định.
+- Fcitx5 + Bamboo cho bộ gõ tiếng Việt.
+- GDM quản lý đăng nhập và giữ GNOME làm fallback.
+
+## Kiến trúc và đường rollback
+
+![Hyprland stack and rollback flow](docs/images/hyprland-stack.svg)
+
+Các nguồn giao diện được pin trong `flake.lock`, vì vậy rebuild không tự ý lấy
+phiên bản end4/Hyprland mới. `end4-setup` chỉ thay hai thư mục:
+
+```text
+~/.config/hypr
+~/.config/quickshell
 ```
-/etc/nixos/
-├── flake.nix              # Flake entry point (inputs/outputs)
-├── configuration.nix      # Main system configuration & imports
-├── hardware-configuration.nix # Hardware specific settings (auto-generated)
-└── modules/               # Categorized configuration modules
-    ├── base.nix           # System basics (Timezone, Bluetooth, Network)
-    ├── common.nix         # Common utilities (implied)
-    ├── desktop.nix        # GNOME, GDM, PipeWire, Flatpak
-    ├── dev.nix            # Docker, Android Studio, ADB, Git, Direnv
-    ├── maintenance.nix    # System maintenance tasks (gc, upgrades)
-    ├── packages.nix       # System-wide packages (Editors, Browsers, Runtimes)
-    ├── shell.nix          # Zsh configuration (Aliases, Plugins)
-    ├── terminal.nix       # Terminal emulator settings (Kitty)
-    ├── ui.nix             # Fonts, Icons, Theming
-    ├── user.nix           # User definition (nvtank)
-    └── vietnamese.nix     # Fcitx5 + Bamboo input method
+
+Trước khi thay, script tạo backup có timestamp tại:
+
+```text
+~/.local/state/end4-nixos/backups/
 ```
 
-## ✨ Features
-
-### 🖥️ Desktop & UI
-- **Environment:** GNOME Desktop Manager (GDM) + GNOME.
-- **Audio:** PipeWire (PulseAudio/ALSA compatibility enabled).
-- **Fonts:** JetBrainsMono Nerd Font, Noto Fonts.
-- **Theming:** Papirus Icon Theme, Bibata Cursors.
-- **Input:** Vietnamese support via `fcitx5-bamboo`.
-
-### 🛠️ Development Environment
-- **Languages:** 
-  - Node.js 20 + pnpm
-  - Python 3 + pip + virtualenv
-  - Java 17 + Maven + Gradle
-  - Go + gopls
-  - C/C++ (GCC, GDB, CMake, Ninja, Clang-tools)
-- **Tools:** VS Code, Neovim, Git, Docker, Android Studio.
-- **Shell Enhancements:** `starship`, `zoxide`, `fzf`, `eza` (ls replacement), `bat` (cat replacement), `ripgrep`.
-
-### ⚡ Terminal
-- **Emulator:** Kitty (Configured with JetBrainsMono NF, semi-transparent background).
-- **Shell:** Zsh configured with syntax highlighting, autosuggestions, and custom aliases (`ls` -> `eza`, `cat` -> `bat`).
-
-## 📦 Installation & Usage
-
-### 1. Clone & Setup
-Clone this repository to your NixOS configuration directory (usually `/etc/nixos`).
-
-### 2. Update System
-To apply changes, run the following command:
+## Cài đặt
 
 ```bash
-sudo nixos-rebuild switch --flake .#nixos
+git clone git@github.com:nvtank/NixOSConfig.git /etc/nixos
+cd /etc/nixos
+
+# Build trước, chưa thay đổi hệ thống đang chạy
+nix build .#nixosConfigurations.nixos.config.system.build.toplevel --no-link
+
+# Ghi generation mới và giữ generation cũ trong boot menu
+sudo nixos-rebuild switch --flake path:/etc/nixos#nixos
+
+# Chạy bằng user desktop, tuyệt đối không chạy bằng root
+end4-setup
 ```
 
-### 3. Update Inputs
-To update the flake inputs (e.g., `nixpkgs`):
+Sau đó logout và đăng nhập lại. GDM sẽ chọn **Hyprland** mặc định; mật khẩu đăng
+nhập vẫn được giữ nguyên.
+
+## Phím tắt chính
+
+![Hyprland keyboard shortcuts](docs/images/hyprland-shortcuts.svg)
+
+| Phím | Tác vụ |
+|---|---|
+| `Super + Enter` / `Super + T` | Mở terminal |
+| `Super + Q` | Đóng cửa sổ |
+| `Super + 1…0` | Chuyển thẳng đến workspace |
+| `Ctrl + Alt + ←/→` | Workspace trước/sau |
+| `Ctrl + \`` | Quay lại workspace vừa dùng |
+| `Super + I` | Mở Settings của end4 |
+| `Super + /` | Hiện cheatsheet đầy đủ |
+| `Super + V` | Clipboard history |
+| `Super + Shift + S` | Chụp một vùng màn hình |
+| `Ctrl + Alt + Delete` | Menu logout/reboot/power |
+
+Touchpad dùng hướng cuộn tự nhiên (`natural_scroll = true`). Bộ gõ mặc định là
+Bamboo và được khởi động riêng khi vào Hyprland.
+
+## Cấu trúc repository
+
+```text
+/etc/nixos
+├── flake.nix
+├── flake.lock
+├── configuration.nix
+├── hardware-configuration.nix
+├── docs/images/
+│   ├── hyprland-desktop.png
+│   ├── hyprland-stack.svg
+│   └── hyprland-shortcuts.svg
+└── modules/
+    ├── base.nix
+    ├── desktop.nix             # GNOME/GDM fallback
+    ├── dev.nix
+    ├── end4-hyprland.nix       # Hyprland, Quickshell, setup/rollback
+    ├── end4-execs.lua          # Autostart riêng cho Hyprland
+    ├── end4-keybinds.lua       # Workspace shortcuts
+    ├── end4-variables.lua      # end4-pC và Settings IPC
+    ├── packages.nix
+    ├── shell.nix
+    ├── terminal.nix
+    ├── ui.nix
+    ├── user.nix
+    └── vietnamese.nix          # Fcitx5 + Bamboo
+```
+
+## Cập nhật an toàn
 
 ```bash
-nix flake update
+cd /etc/nixos
+git pull --ff-only
+
+# Luôn build trước
+nix build .#nixosConfigurations.nixos.config.system.build.toplevel --no-link
+
+# Chạy thử; reboot sẽ quay lại boot generation cũ
+sudo nixos-rebuild test --flake path:/etc/nixos#nixos
+
+# Chỉ switch sau khi đã kiểm tra login, panel và bộ gõ
+sudo nixos-rebuild switch --flake path:/etc/nixos#nixos
 ```
 
-## 👤 User
+Không chạy `nix flake update` một cách mù quáng: Hyprland, Quickshell,
+dots-hyprland và end4-pC được pin để tránh thay đổi API bất ngờ.
 
-- **Username:** `nvtank`
-- **Groups:** `wheel` (sudo), `networkmanager`, `docker`, `adbusers`.
+## Rollback
 
----
-*Generated automatically for documentation purposes.*
+### Theme và config người dùng
+
+```bash
+end4-rollback
+```
+
+Sau đó logout và chọn GNOME trong GDM nếu cần.
+
+### Generation NixOS
+
+- Chọn generation cũ trong boot menu, hoặc
+- dùng `sudo nixos-rebuild switch --rollback` từ một phiên còn hoạt động.
+
+Git cũng giữ lịch sử theo từng phase, giúp revert riêng compositor, theme,
+input/keybind hoặc bản sửa Settings mà không phải bỏ toàn bộ cấu hình.
+
+## Kiểm tra nhanh
+
+```bash
+Hyprland --version
+qs --version
+hyprctl configerrors
+fcitx5-remote -n
+systemctl is-active display-manager.service
+```
+
+Kết quả mong đợi: Hyprland `0.55.0`, Quickshell `0.2.1`, không có config error,
+input method là `bamboo`, và display manager ở trạng thái `active`.

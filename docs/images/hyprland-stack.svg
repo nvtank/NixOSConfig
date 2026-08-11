@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">NixOS Hyprland end4 architecture and rollback</title>
+  <desc id="desc">GDM starts Hyprland with Quickshell and end4, while GNOME and previous NixOS generations remain available as fallbacks.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#11111b"/><stop offset="1" stop-color="#1e1e2e"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#89b4fa"/><stop offset="1" stop-color="#cba6f7"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity=".3"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#89b4fa"/></marker>
+  </defs>
+  <rect width="1200" height="520" rx="28" fill="url(#bg)"/>
+  <text x="60" y="64" fill="#cdd6f4" font-family="Inter, sans-serif" font-size="30" font-weight="700">Desktop stack và đường lui an toàn</text>
+  <text x="60" y="96" fill="#a6adc8" font-family="Inter, sans-serif" font-size="17">Một boot profile khai báo bằng Nix, hai session đăng nhập độc lập</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="150" width="190" height="100" rx="20" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+    <text x="155" y="190" text-anchor="middle" fill="#89b4fa" font-family="Inter, sans-serif" font-size="24" font-weight="700">GDM</text>
+    <text x="155" y="220" text-anchor="middle" fill="#bac2de" font-family="Inter, sans-serif" font-size="16">Login manager</text>
+
+    <rect x="355" y="130" width="290" height="140" rx="22" fill="#313244" stroke="url(#accent)" stroke-width="3"/>
+    <text x="500" y="176" text-anchor="middle" fill="#cba6f7" font-family="Inter, sans-serif" font-size="26" font-weight="700">Hyprland 0.55</text>
+    <text x="500" y="208" text-anchor="middle" fill="#cdd6f4" font-family="Inter, sans-serif" font-size="17">Quickshell + end4-pC</text>
+    <text x="500" y="236" text-anchor="middle" fill="#a6adc8" font-family="Inter, sans-serif" font-size="15">Fcitx5 · Bamboo · Wayland portals</text>
+
+    <rect x="355" y="330" width="290" height="110" rx="22" fill="#2a2b3c" stroke="#a6e3a1" stroke-width="2"/>
+    <text x="500" y="374" text-anchor="middle" fill="#a6e3a1" font-family="Inter, sans-serif" font-size="24" font-weight="700">GNOME fallback</text>
+    <text x="500" y="405" text-anchor="middle" fill="#bac2de" font-family="Inter, sans-serif" font-size="16">Giữ nguyên trong GDM</text>
+
+    <rect x="770" y="130" width="360" height="140" rx="22" fill="#313244" stroke="#f9e2af" stroke-width="2"/>
+    <text x="950" y="174" text-anchor="middle" fill="#f9e2af" font-family="Inter, sans-serif" font-size="24" font-weight="700">User config backup</text>
+    <text x="950" y="207" text-anchor="middle" fill="#cdd6f4" font-family="monospace" font-size="15">~/.local/state/end4-nixos/</text>
+    <text x="950" y="238" text-anchor="middle" fill="#a6adc8" font-family="Inter, sans-serif" font-size="15">end4-setup ⇄ end4-rollback</text>
+
+    <rect x="770" y="330" width="360" height="110" rx="22" fill="#2a2b3c" stroke="#f38ba8" stroke-width="2"/>
+    <text x="950" y="372" text-anchor="middle" fill="#f38ba8" font-family="Inter, sans-serif" font-size="23" font-weight="700">NixOS generation cũ</text>
+    <text x="950" y="405" text-anchor="middle" fill="#bac2de" font-family="Inter, sans-serif" font-size="16">Boot menu hoặc switch --rollback</text>
+  </g>
+
+  <path d="M250 195 H345" stroke="#89b4fa" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M250 215 C300 215 300 385 345 385" stroke="#a6e3a1" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M645 195 H760" stroke="#89b4fa" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M645 225 C710 225 705 385 760 385" stroke="#f38ba8" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+</svg>
