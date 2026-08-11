@@ -1,0 +1,257 @@
+{ config, inputs, lib, pkgs, ... }:
+
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  hyprlandPackage = inputs.hyprland.packages.${system}.hyprland;
+  hyprlandPortal = inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
+  quickshellPackage = inputs.quickshell.packages.${system}.default;
+  end4Quickshell = pkgs.stdenv.mkDerivation {
+    pname = "end4-quickshell";
+    version = "0.2.1";
+    dontUnpack = true;
+
+    nativeBuildInputs = [ pkgs.makeWrapper pkgs.qt6.wrapQtAppsHook ];
+    buildInputs = with pkgs; [
+      quickshellPackage
+      gsettings-desktop-schemas
+      kdePackages.kirigami
+      kdePackages.qtlocation
+      kdePackages.qtpositioning
+      kdePackages.qtwayland
+      kdePackages.syntax-highlighting
+      qt6.qt5compat
+      qt6.qtbase
+      qt6.qtdeclarative
+      qt6.qtimageformats
+      qt6.qtmultimedia
+      qt6.qtpositioning
+      qt6.qtquicktimeline
+      qt6.qtsensors
+      qt6.qtsvg
+      qt6.qttools
+      qt6.qttranslations
+      qt6.qtvirtualkeyboard
+      qt6.qtwayland
+    ];
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out/bin"
+      makeWrapper ${quickshellPackage}/bin/qs "$out/bin/qs" \
+        --prefix XDG_DATA_DIRS : ${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}
+      runHook postInstall
+    '';
+  };
+  end4Variables = ./end4-variables.lua;
+  end4Execs = ./end4-execs.lua;
+  end4Keybinds = ./end4-keybinds.lua;
+
+  end4Setup = pkgs.writeShellApplication {
+    name = "end4-setup";
+    runtimeInputs = with pkgs; [ coreutils gnused rsync gnutar gzip ];
+    text = ''
+      set -euo pipefail
+
+      case "''${1:-}" in
+        --check)
+          echo "illogical-impulse: ${inputs.illogical-impulse}"
+          echo "end4-pC: ${inputs.end4-pc}"
+          exit 0
+          ;;
+        --help|-h)
+          echo "Usage: end4-setup [--check]"
+          echo "Installs mutable Hyprland and Quickshell configs after creating a backup."
+          exit 0
+          ;;
+        "") ;;
+        *) echo "Unknown argument: $1" >&2; exit 2 ;;
+      esac
+
+      if [[ "$(id -u)" -eq 0 ]]; then
+        echo "Run end4-setup as the desktop user, not as root." >&2
+        exit 1
+      fi
+
+      config_root="''${XDG_CONFIG_HOME:-$HOME/.config}"
+      state_root="''${XDG_STATE_HOME:-$HOME/.local/state}/end4-nixos"
+      stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+      backup_dir="$state_root/backups/$stamp"
+
+      mkdir -p "$backup_dir" "$config_root"
+      : > "$backup_dir/absent"
+
+      for target in hypr quickshell; do
+        if [[ -e "$config_root/$target" ]]; then
+          tar -C "$config_root" -czf "$backup_dir/$target.tar.gz" "$target"
+        else
+          printf '%s\n' "$target" >> "$backup_dir/absent"
+        fi
+      done
+
+      for staging_dir in "$config_root/hypr.end4-new" "$config_root/quickshell.end4-new"; do
+        if [[ -e "$staging_dir" ]]; then
+          chmod -R u+w "$staging_dir"
+          rm -rf "''${staging_dir:?}"
+        fi
+      done
+      mkdir -p "$config_root/hypr.end4-new" "$config_root/quickshell.end4-new"
+
+      rsync -a --no-owner --no-group ${inputs.illogical-impulse}/dots/.config/hypr/ "$config_root/hypr.end4-new/"
+      rsync -a --no-owner --no-group ${inputs.illogical-impulse}/dots/.config/quickshell/ "$config_root/quickshell.end4-new/"
+      chmod -R u+w "$config_root/hypr.end4-new" "$config_root/quickshell.end4-new"
+      rsync -a --no-owner --no-group --exclude='.git' ${inputs.end4-pc}/ "$config_root/quickshell.end4-new/end4-pC/"
+
+      cp ${end4Variables} "$config_root/hypr.end4-new/custom/variables.lua"
+      cp ${end4Execs} "$config_root/hypr.end4-new/custom/execs.lua"
+      cp ${end4Keybinds} "$config_root/hypr.end4-new/custom/keybinds.lua"
+
+      if [[ -e "$config_root/hypr" ]]; then
+        mv "$config_root/hypr" "$backup_dir/hypr.pre-switch"
+      fi
+      if [[ -e "$config_root/quickshell" ]]; then
+        mv "$config_root/quickshell" "$backup_dir/quickshell.pre-switch"
+      fi
+      mv "$config_root/hypr.end4-new" "$config_root/hypr"
+      mv "$config_root/quickshell.end4-new" "$config_root/quickshell"
+
+      ln -sfn "$backup_dir" "$state_root/current-backup"
+      printf '%s\n' "$backup_dir" > "$state_root/last-install"
+
+      echo "end4 configuration installed."
+      echo "Backup: $backup_dir"
+      echo "Rollback: end4-rollback"
+    '';
+  };
+
+  end4Rollback = pkgs.writeShellApplication {
+    name = "end4-rollback";
+    runtimeInputs = with pkgs; [ coreutils gnutar gzip procps ];
+    text = ''
+      set -euo pipefail
+
+      if [[ "$(id -u)" -eq 0 ]]; then
+        echo "Run end4-rollback as the desktop user, not as root." >&2
+        exit 1
+      fi
+
+      config_root="''${XDG_CONFIG_HOME:-$HOME/.config}"
+      state_root="''${XDG_STATE_HOME:-$HOME/.local/state}/end4-nixos"
+      backup_dir="$(readlink -f "$state_root/current-backup" 2>/dev/null || true)"
+
+      if [[ -z "$backup_dir" || ! -d "$backup_dir" ]]; then
+        echo "No end4 backup was found; refusing to change your config." >&2
+        exit 1
+      fi
+
+      pkill -x qs 2>/dev/null || true
+      pkill -x quickshell 2>/dev/null || true
+
+      for target in hypr quickshell; do
+        if [[ -e "$config_root/$target" ]]; then
+          chmod -R u+w "$config_root/$target"
+        fi
+        rm -rf "''${config_root:?}/$target"
+        if [[ -f "$backup_dir/$target.tar.gz" ]]; then
+          tar -C "$config_root" -xzf "$backup_dir/$target.tar.gz"
+        fi
+      done
+
+      rm -f "$state_root/current-backup"
+      echo "Restored configuration from $backup_dir"
+      echo "Select GNOME at GDM, then roll back the NixOS generation if needed."
+    '';
+  };
+in
+{
+  # Hyprland is an additional login session. GNOME and GDM intentionally stay
+  # enabled, providing a known-good fallback from the login screen.
+  programs.hyprland = {
+    enable = true;
+    package = hyprlandPackage;
+    portalPackage = hyprlandPortal;
+    withUWSM = false;
+    xwayland.enable = true;
+  };
+
+  # Keep password authentication, but make Hyprland the preselected GDM
+  # session. GNOME remains installed and selectable as the fallback.
+  services.displayManager.defaultSession = "hyprland";
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = lib.mkAfter [ hyprlandPortal pkgs.xdg-desktop-portal-gtk ];
+    config.hyprland = {
+      default = [ "hyprland" "gtk" ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+    };
+  };
+
+  security.pam.services.hyprlock = { };
+  security.polkit.enable = true;
+  services.upower.enable = true;
+  services.geoclue2.enable = true;
+  services.udev.packages = [ pkgs.ddcutil ];
+
+  # Hyprland does not process XDG autostart entries like GNOME does. Keep the
+  # configured Bamboo/Unikey input method alive for every graphical session.
+  systemd.user.services.fcitx5-daemon = {
+    description = "Fcitx5 input method daemon";
+    serviceConfig = {
+      ExecStart = "${config.i18n.inputMethod.package}/bin/fcitx5 -D -r";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+  };
+
+  boot.kernelModules = [ "i2c-dev" ];
+  users.users.nvtank.extraGroups = [ "video" "input" "i2c" ];
+
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+  };
+
+  environment.systemPackages = with pkgs; [
+    hyprlandPackage
+    hyprlandPortal
+    end4Quickshell
+    end4Setup
+    end4Rollback
+
+    bc
+    brightnessctl
+    cliphist
+    ddcutil
+    foot
+    fuzzel
+    gnome-keyring
+    hypridle
+    hyprlock
+    hyprpicker
+    hyprshot
+    hyprsunset
+    imagemagick
+    libnotify
+    libqalculate
+    material-symbols
+    matugen
+    networkmanagerapplet
+    pavucontrol
+    playerctl
+    procps
+    slurp
+    swappy
+    tesseract
+    upower
+    wf-recorder
+    wl-clipboard
+    wlogout
+    wtype
+    ydotool
+  ];
+
+  fonts.packages = with pkgs; [
+    material-symbols
+    rubik
+    twemoji-color-font
+  ];
+}
