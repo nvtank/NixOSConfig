@@ -11,6 +11,7 @@
     ./modules/shell.nix
     ./modules/ui.nix
     ./modules/desktop.nix
+    ./modules/end4-hyprland.nix
     ./modules/packages.nix
     ./modules/dev.nix
     ./modules/maintenance.nix
