@@ -6,16 +6,16 @@
     <filter id="shadow"><feDropShadow dx="0" dy="7" stdDeviation="8" flood-opacity=".32"/></filter>
   </defs>
   <rect width="1200" height="500" rx="28" fill="url(#bg)"/>
-  <text x="60" y="62" fill="#cdd6f4" font-family="Inter, sans-serif" font-size="30" font-weight="700">Workflow bàn phím</text>
-  <text x="60" y="94" fill="#a6adc8" font-family="Inter, sans-serif" font-size="17">Super = phím Windows / Command</text>
+  <text x="60" y="62" fill="#cdd6f4" font-family="Inter, sans-serif" font-size="30" font-weight="700">Keyboard workflow</text>
+  <text x="60" y="94" fill="#a6adc8" font-family="Inter, sans-serif" font-size="17">Super = Windows / Command key</text>
 
   <g font-family="Inter, sans-serif" filter="url(#shadow)">
-    <g transform="translate(60 135)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#89b4fa"/><text x="24" y="38" fill="#89b4fa" font-size="17">TERMINAL</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + Enter</text><text x="24" y="110" fill="#a6adc8" font-size="15">hoặc Super + T</text></g>
-    <g transform="translate(435 135)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#cba6f7"/><text x="24" y="38" fill="#cba6f7" font-size="17">SETTINGS</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + I</text><text x="24" y="110" fill="#a6adc8" font-size="15">end4 Settings qua IPC</text></g>
-    <g transform="translate(810 135)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#f38ba8"/><text x="24" y="38" fill="#f38ba8" font-size="17">CLOSE WINDOW</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + Q</text><text x="24" y="110" fill="#a6adc8" font-size="15">đóng cửa sổ đang focus</text></g>
+    <g transform="translate(60 135)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#89b4fa"/><text x="24" y="38" fill="#89b4fa" font-size="17">TERMINAL</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + Enter</text><text x="24" y="110" fill="#a6adc8" font-size="15">or Super + T</text></g>
+    <g transform="translate(435 135)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#cba6f7"/><text x="24" y="38" fill="#cba6f7" font-size="17">SETTINGS</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + I</text><text x="24" y="110" fill="#a6adc8" font-size="15">end4 Settings via IPC</text></g>
+    <g transform="translate(810 135)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#f38ba8"/><text x="24" y="38" fill="#f38ba8" font-size="17">CLOSE WINDOW</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + Q</text><text x="24" y="110" fill="#a6adc8" font-size="15">close the focused window</text></g>
 
-    <g transform="translate(60 305)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#a6e3a1"/><text x="24" y="38" fill="#a6e3a1" font-size="17">WORKSPACE</text><text x="24" y="78" fill="#cdd6f4" font-size="21" font-weight="700">Ctrl + Alt + ← / →</text><text x="24" y="108" fill="#a6adc8" font-size="15">Ctrl + ` quay lại workspace cũ</text></g>
-    <g transform="translate(435 305)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#f9e2af"/><text x="24" y="38" fill="#f9e2af" font-size="17">CLIPBOARD</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + V</text><text x="24" y="110" fill="#a6adc8" font-size="15">lịch sử clipboard</text></g>
+    <g transform="translate(60 305)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#a6e3a1"/><text x="24" y="38" fill="#a6e3a1" font-size="17">WORKSPACE</text><text x="24" y="78" fill="#cdd6f4" font-size="21" font-weight="700">Ctrl + Alt + ← / →</text><text x="24" y="108" fill="#a6adc8" font-size="15">Ctrl + ` returns to the last workspace</text></g>
+    <g transform="translate(435 305)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#f9e2af"/><text x="24" y="38" fill="#f9e2af" font-size="17">CLIPBOARD</text><text x="24" y="82" fill="#cdd6f4" font-size="24" font-weight="700">Super + V</text><text x="24" y="110" fill="#a6adc8" font-size="15">clipboard history</text></g>
     <g transform="translate(810 305)"><rect width="330" height="130" rx="20" fill="#313244" stroke="#fab387"/><text x="24" y="38" fill="#fab387" font-size="17">SESSION</text><text x="24" y="78" fill="#cdd6f4" font-size="21" font-weight="700">Ctrl + Alt + Delete</text><text x="24" y="108" fill="#a6adc8" font-size="15">logout · reboot · shutdown</text></g>
   </g>
 </svg>

@@ -4,83 +4,85 @@
 ![Hyprland](https://img.shields.io/badge/Hyprland-0.55.0-58E1FF?logo=wayland&logoColor=11111B)
 ![Quickshell](https://img.shields.io/badge/Quickshell-0.2.1-CBA6F7)
 
-Cấu hình NixOS cá nhân theo hướng **Hyprland + end4-pC**, có bộ gõ tiếng Việt,
-workflow dành cho lập trình và đường lui an toàn về GNOME.
+A personal NixOS configuration centered around **Hyprland + end4-pC**, with
+Vietnamese input support, a development-focused workflow, and a safe fallback
+to GNOME.
 
-> Hyprland là desktop mặc định. GNOME/GDM vẫn được giữ lại để đăng nhập dự
-> phòng khi theme, GPU hoặc cấu hình Wayland gặp lỗi.
+> Hyprland is the default desktop session. GNOME and GDM remain installed as a
+> known-good fallback if the theme, GPU stack, or Wayland configuration fails.
 
-## Giao diện
+## Desktop preview
 
 ![Hyprland end4 desktop](docs/images/hyprland-desktop.png)
 
-Giao diện sử dụng:
+The desktop stack includes:
 
-- **Hyprland 0.55** làm Wayland compositor.
-- **end4-pC** chạy trên **Quickshell 0.2.1** cho bar, launcher, overview,
-  notification, wallpaper và Settings.
-- `foot` làm terminal mặc định.
-- Fcitx5 + Bamboo cho bộ gõ tiếng Việt.
-- GDM quản lý đăng nhập và giữ GNOME làm fallback.
+- **Hyprland 0.55** as the Wayland compositor.
+- **end4-pC** on **Quickshell 0.2.1** for the bar, launcher, overview,
+  notifications, wallpaper, and Settings.
+- `foot` as the default terminal.
+- Fcitx5 + Bamboo for Vietnamese input.
+- GDM for login management, with GNOME retained as a fallback session.
 
-## Kiến trúc và đường rollback
+## Architecture and rollback paths
 
 ![Hyprland stack and rollback flow](docs/images/hyprland-stack.svg)
 
-Các nguồn giao diện được pin trong `flake.lock`, vì vậy rebuild không tự ý lấy
-phiên bản end4/Hyprland mới. `end4-setup` chỉ thay hai thư mục:
+The desktop sources are pinned in `flake.lock`, so rebuilds do not silently
+pull newer Hyprland or end4 revisions. `end4-setup` only replaces these two
+directories:
 
 ```text
 ~/.config/hypr
 ~/.config/quickshell
 ```
 
-Trước khi thay, script tạo backup có timestamp tại:
+Before replacing them, the script creates a timestamped backup under:
 
 ```text
 ~/.local/state/end4-nixos/backups/
 ```
 
-## Cài đặt
+## Installation
 
 ```bash
 git clone git@github.com:nvtank/NixOSConfig.git /etc/nixos
 cd /etc/nixos
 
-# Build trước, chưa thay đổi hệ thống đang chạy
+# Build first without changing the running system
 nix build .#nixosConfigurations.nixos.config.system.build.toplevel --no-link
 
-# Ghi generation mới và giữ generation cũ trong boot menu
+# Persist a new generation while retaining older generations in the boot menu
 sudo nixos-rebuild switch --flake path:/etc/nixos#nixos
 
-# Chạy bằng user desktop, tuyệt đối không chạy bằng root
+# Run as the desktop user, never as root
 end4-setup
 ```
 
-Sau đó logout và đăng nhập lại. GDM sẽ chọn **Hyprland** mặc định; mật khẩu đăng
-nhập vẫn được giữ nguyên.
+Log out and sign in again. GDM preselects **Hyprland**, while password
+authentication remains enabled.
 
-## Phím tắt chính
+## Essential shortcuts
 
 ![Hyprland keyboard shortcuts](docs/images/hyprland-shortcuts.svg)
 
-| Phím | Tác vụ |
+| Shortcut | Action |
 |---|---|
-| `Super + Enter` / `Super + T` | Mở terminal |
-| `Super + Q` | Đóng cửa sổ |
-| `Super + 1…0` | Chuyển thẳng đến workspace |
-| `Ctrl + Alt + ←/→` | Workspace trước/sau |
-| `Ctrl + \`` | Quay lại workspace vừa dùng |
-| `Super + I` | Mở Settings của end4 |
-| `Super + /` | Hiện cheatsheet đầy đủ |
-| `Super + V` | Clipboard history |
-| `Super + Shift + S` | Chụp một vùng màn hình |
-| `Ctrl + Alt + Delete` | Menu logout/reboot/power |
+| `Super + Enter` / `Super + T` | Open a terminal |
+| `Super + Q` | Close the focused window |
+| `Super + 1…0` | Jump directly to a workspace |
+| `Ctrl + Alt + ←/→` | Previous/next workspace |
+| `Ctrl + \`` | Return to the last-used workspace |
+| `Super + I` | Open end4 Settings |
+| `Super + /` | Open the full shortcut cheat sheet |
+| `Super + V` | Open clipboard history |
+| `Super + Shift + S` | Capture a screen region |
+| `Ctrl + Alt + Delete` | Open the logout/reboot/power menu |
 
-Touchpad dùng hướng cuộn tự nhiên (`natural_scroll = true`). Bộ gõ mặc định là
-Bamboo và được khởi động riêng khi vào Hyprland.
+The touchpad uses natural scrolling (`natural_scroll = true`). Bamboo is the
+default input method and starts specifically with the Hyprland session.
 
-## Cấu trúc repository
+## Repository layout
 
 ```text
 /etc/nixos
@@ -97,9 +99,9 @@ Bamboo và được khởi động riêng khi vào Hyprland.
     ├── desktop.nix             # GNOME/GDM fallback
     ├── dev.nix
     ├── end4-hyprland.nix       # Hyprland, Quickshell, setup/rollback
-    ├── end4-execs.lua          # Autostart riêng cho Hyprland
+    ├── end4-execs.lua          # Hyprland-specific autostart
     ├── end4-keybinds.lua       # Workspace shortcuts
-    ├── end4-variables.lua      # end4-pC và Settings IPC
+    ├── end4-variables.lua      # end4-pC selection and Settings IPC
     ├── packages.nix
     ├── shell.nix
     ├── terminal.nix
@@ -108,44 +110,45 @@ Bamboo và được khởi động riêng khi vào Hyprland.
     └── vietnamese.nix          # Fcitx5 + Bamboo
 ```
 
-## Cập nhật an toàn
+## Safe updates
 
 ```bash
 cd /etc/nixos
 git pull --ff-only
 
-# Luôn build trước
+# Always build first
 nix build .#nixosConfigurations.nixos.config.system.build.toplevel --no-link
 
-# Chạy thử; reboot sẽ quay lại boot generation cũ
+# Test without changing the default boot generation
 sudo nixos-rebuild test --flake path:/etc/nixos#nixos
 
-# Chỉ switch sau khi đã kiểm tra login, panel và bộ gõ
+# Persist only after login, panel, and input-method checks pass
 sudo nixos-rebuild switch --flake path:/etc/nixos#nixos
 ```
 
-Không chạy `nix flake update` một cách mù quáng: Hyprland, Quickshell,
-dots-hyprland và end4-pC được pin để tránh thay đổi API bất ngờ.
+Avoid running `nix flake update` blindly. Hyprland, Quickshell,
+dots-hyprland, and end4-pC are pinned to prevent unexpected API changes.
 
 ## Rollback
 
-### Theme và config người dùng
+### User theme and configuration
 
 ```bash
 end4-rollback
 ```
 
-Sau đó logout và chọn GNOME trong GDM nếu cần.
+Log out and select GNOME in GDM if necessary.
 
-### Generation NixOS
+### NixOS generation
 
-- Chọn generation cũ trong boot menu, hoặc
-- dùng `sudo nixos-rebuild switch --rollback` từ một phiên còn hoạt động.
+- Select an older generation from the boot menu, or
+- run `sudo nixos-rebuild switch --rollback` from a working session.
 
-Git cũng giữ lịch sử theo từng phase, giúp revert riêng compositor, theme,
-input/keybind hoặc bản sửa Settings mà không phải bỏ toàn bộ cấu hình.
+The Git history is also split into focused phases, making it possible to
+revert the compositor, theme, input/keybind workflow, or Settings compatibility
+fix independently.
 
-## Kiểm tra nhanh
+## Quick verification
 
 ```bash
 Hyprland --version
@@ -155,5 +158,5 @@ fcitx5-remote -n
 systemctl is-active display-manager.service
 ```
 
-Kết quả mong đợi: Hyprland `0.55.0`, Quickshell `0.2.1`, không có config error,
-input method là `bamboo`, và display manager ở trạng thái `active`.
+Expected results: Hyprland `0.55.0`, Quickshell `0.2.1`, no configuration
+errors, `bamboo` as the input method, and an `active` display manager.
