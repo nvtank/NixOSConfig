@@ -109,12 +109,12 @@ let
         region)
           geometry="$(slurp)" || exit 0
           countdown
-          wf-recorder --geometry "$geometry" --file "$saved_file" >/tmp/end4-wf-recorder.log 2>&1 &
+          wf-recorder --geometry "$geometry" --file "$saved_file" 9>&- >/tmp/end4-wf-recorder.log 2>&1 &
           ;;
         output)
           monitor="$(hyprctl activeworkspace -j | jq -r '.monitor')"
           countdown
-          wf-recorder --output "$monitor" --file "$saved_file" >/tmp/end4-wf-recorder.log 2>&1 &
+          wf-recorder --output "$monitor" --file "$saved_file" 9>&- >/tmp/end4-wf-recorder.log 2>&1 &
           ;;
         *) echo "Usage: end4-screen-record [region|output]" >&2; exit 2 ;;
       esac
