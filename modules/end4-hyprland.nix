@@ -46,6 +46,7 @@ let
   end4Execs = ./end4-execs.lua;
   end4Keybinds = ./end4-keybinds.lua;
   end4Rules = ./end4-rules.lua;
+  end4LockVisual = ./end4-lock-visual.qml;
 
   end4Screenshot = pkgs.writeShellApplication {
     name = "end4-screenshot";
@@ -109,12 +110,12 @@ let
         region)
           geometry="$(slurp)" || exit 0
           countdown
-          wf-recorder --geometry "$geometry" --file "$saved_file" >/tmp/end4-wf-recorder.log 2>&1 &
+          wf-recorder --geometry "$geometry" --file "$saved_file" 9>&- >/tmp/end4-wf-recorder.log 2>&1 &
           ;;
         output)
           monitor="$(hyprctl activeworkspace -j | jq -r '.monitor')"
           countdown
-          wf-recorder --output "$monitor" --file "$saved_file" >/tmp/end4-wf-recorder.log 2>&1 &
+          wf-recorder --output "$monitor" --file "$saved_file" 9>&- >/tmp/end4-wf-recorder.log 2>&1 &
           ;;
         *) echo "Usage: end4-screen-record [region|output]" >&2; exit 2 ;;
       esac
@@ -192,10 +193,27 @@ let
         "$config_root/hypr.end4-new/hyprland/keybinds.lua"
 
       # This laptop's touchpad feels reversed with the end4 shell override.
-      # Apply the user's preferred physical scroll direction after staging.
+      # Apply the user's preferred physical scroll direction after staging and
+      # keep compositor animations enabled for smooth workspace transitions.
       sed -i 's/natural_scroll = false/natural_scroll = true/' \
         "$config_root/hypr.end4-new/hyprland/shellOverrides/main.lua"
+      sed -i 's/animations = { enabled = false }/animations = { enabled = true }/' \
+        "$config_root/hypr.end4-new/hyprland/shellOverrides/main.lua"
 
+      # Keep the desktop widget picker visibly translucent. This submenu uses
+      # its own opaque Material layer instead of the global panel background.
+      sed -i \
+        's|color: Appearance.colors.colLayer0|color: Qt.rgba(Appearance.colors.colLayer0.r, Appearance.colors.colLayer0.g, Appearance.colors.colLayer0.b, 0.14)|' \
+        "$config_root/quickshell.end4-new/end4-pC/modules/common/widgets/WidgetsSubmenu.qml"
+
+      # Install the custom lock-screen visual layer while leaving the upstream
+      # PAM context and password controls untouched.
+      cp ${end4LockVisual} \
+        "$config_root/quickshell.end4-new/end4-pC/modules/ii/lock/LockVisual.qml"
+      sed -i '/    \/\/ Main toolbar: password box/i\    LockVisual {\n        anchors.fill: parent\n        z: -0.5\n    }\n' \
+        "$config_root/quickshell.end4-new/end4-pC/modules/ii/lock/LockSurface.qml"
+      sed -i 's/bottomMargin: 20/bottomMargin: 28/' \
+        "$config_root/quickshell.end4-new/end4-pC/modules/ii/lock/LockSurface.qml"
       cp ${end4Variables} "$config_root/hypr.end4-new/custom/variables.lua"
       cp ${end4Execs} "$config_root/hypr.end4-new/custom/execs.lua"
       cp ${end4Keybinds} "$config_root/hypr.end4-new/custom/keybinds.lua"
